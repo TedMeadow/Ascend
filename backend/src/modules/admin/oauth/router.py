@@ -21,7 +21,6 @@ def create_oauth_provider(config: OAuthProviderConfig, db: Session = Depends(get
     db.refresh(db_config)
     return db_config
 
-
 @oauth_router.get("/", response_model=List[OAuthProviderConfig])
 def get_all_oauth_providers(db: Session = Depends(get_db)):
     return db.exec(select(OAuthProviderConfig)).all()

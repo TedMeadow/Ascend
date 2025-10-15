@@ -2,7 +2,6 @@ from cryptography.fernet import Fernet, InvalidToken
 from .config import settings
 from pwdlib import PasswordHash
 
-
 class CryptoService:
     def __init__(self, key: str):
         self.fernet = Fernet(key.encode())

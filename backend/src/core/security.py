@@ -51,7 +51,6 @@ def get_current_user(
         raise credentials_exception
     return user
 
-
 def get_current_superuser(current_user: User = Depends(get_current_user)) -> User:
     if not current_user.is_superuser:
         raise HTTPException(

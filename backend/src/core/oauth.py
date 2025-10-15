@@ -6,7 +6,6 @@ from src.models.oauth_config import OAuthProviderConfig
 
 oauth = OAuth()
 
-
 def load_and_register_providers():
     """Загружает активные конфигурации OAuth из БД и регистрирует их в Authlib."""
     print("Loading and registering OAuth providers...")

@@ -38,11 +38,9 @@ def test_login_success(client: TestClient):
     assert "access_token" in data
     assert data["token_type"] == "bearer"
 
-
 def test_get_me_unauthorized(client: TestClient):
     response = client.get("/user/me")
     assert response.status_code == 401
-
 
 def test_get_me_success(client: TestClient):
     # Регистрируемся

@@ -4,7 +4,6 @@ from fastapi.testclient import TestClient
 # Импортируем тестового пользователя из другого файла
 from .test_auth import TEST_USER
 
-
 def get_auth_headers(client: TestClient) -> dict:
     """Вспомогательная функция для регистрации, логина и получения заголовков."""
     client.post("/auth/register", json=TEST_USER)
@@ -12,7 +11,6 @@ def get_auth_headers(client: TestClient) -> dict:
     token_response = client.post("/auth/token", data=login_data)
     token = token_response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
-
 
 def test_create_task_unauthorized(client: TestClient):
     response = client.post("/tasks/", json={"title": "test task"})
@@ -36,12 +34,10 @@ def test_create_and_get_task(client: TestClient):
     assert get_response.status_code == 200
     assert get_response.json()["description"] == task_data["description"]
 
-
 def test_get_all_my_tasks(client: TestClient):
     headers = get_auth_headers(client)
     client.post("/tasks/", json={"title": "Task 1"}, headers=headers)
     client.post("/tasks/", json={"title": "Task 2"}, headers=headers)
-
     response = client.get("/tasks/", headers=headers)
     assert response.status_code == 200
     assert len(response.json()) == 2
