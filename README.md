@@ -96,7 +96,7 @@ cd Ascend/backend
     ```bash
     uvicorn src.main:app --reload
     ```
-    API и документация будут доступны по адресу `http://12.0.0.1:8000/docs`.
+    API и документация будут доступны по адресу `http://127.0.0.1:8000/docs`.
 
 ---
 
