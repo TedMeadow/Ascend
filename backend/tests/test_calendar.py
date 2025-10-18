@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 # Предполагается, что эта вспомогательная функция уже есть в ваших тестах,
 # например, в tests/test_tasks.py или в conftest.py
 from .test_tasks import get_auth_headers
@@ -8,8 +8,8 @@ def test_create_event_unauthorized(client: TestClient):
     """Тест: нельзя создать событие без авторизации."""
     response = client.post("/calendar/events", json={
         "title": "Unauthorized Event",
-        "start_time": datetime.utcnow().isoformat(),
-        "end_time": (datetime.utcnow() + timedelta(hours=1)).isoformat()
+        "start_time": datetime.now(timezone.utc).isoformat(),
+        "end_time": (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
     })
     assert response.status_code == 401
 
@@ -19,8 +19,8 @@ def test_create_and_get_event(client: TestClient):
     event_data = {
         "title": "Team Meeting",
         "description": "Discuss project progress",
-        "start_time": datetime.utcnow().isoformat(),
-        "end_time": (datetime.utcnow() + timedelta(hours=1)).isoformat()
+        "start_time": datetime.now(timezone.utc).isoformat(),
+        "end_time": (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
     }
     
     # Создание
@@ -51,8 +51,8 @@ def test_create_event_linked_to_task(client: TestClient):
     # 2. Создаем событие, связанное с этой задачей
     event_data = {
         "title": "Work on presentation",
-        "start_time": datetime.utcnow().isoformat(),
-        "end_time": (datetime.utcnow() + timedelta(hours=2)).isoformat(),
+        "start_time": datetime.now(timezone.utc).isoformat(),
+        "end_time": (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat(),
         "task_id": task_id
     }
     event_res = client.post("/calendar/events", json=event_data, headers=headers)
@@ -64,7 +64,7 @@ def test_update_and_delete_event(client: TestClient):
     headers = get_auth_headers(client)
     
     # 1. Создаем событие
-    event_data = {"title": "Initial Title", "start_time": datetime.utcnow().isoformat(), "end_time": (datetime.utcnow() + timedelta(hours=1)).isoformat()}
+    event_data = {"title": "Initial Title", "start_time": datetime.now(timezone.utc).isoformat(), "end_time": (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()}
     create_response = client.post("/calendar/events", json=event_data, headers=headers)
     event_id = create_response.json()["id"]
 
@@ -85,7 +85,7 @@ def test_update_and_delete_event(client: TestClient):
 def test_get_calendar_view(client: TestClient):
     """Тест: главный эндпоинт /calendar/ возвращает правильные данные за период."""
     headers = get_auth_headers(client)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     # 1. Создаем данные для теста
     # Событие внутри диапазона

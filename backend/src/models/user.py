@@ -14,7 +14,11 @@ class User(SQLModel, table = True):
 
 
     oauth_accounts: List['OAuthAccount'] = Relationship(back_populates='user')
-
+    tasks: List["Task"] = Relationship(back_populates="owner")
+    calendar_events: List["CalendarEvent"] = Relationship(back_populates="owner")
+    idea_folders: List["IdeaFolder"] = Relationship(back_populates="owner")
+    ideas: List["Idea"] = Relationship(back_populates="owner")
+    tags: List["Tag"] = Relationship(back_populates="owner")
 
 
 class OAuthAccount(SQLModel, table=True):

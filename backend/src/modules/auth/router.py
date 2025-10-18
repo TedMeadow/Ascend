@@ -102,4 +102,4 @@ async def get_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Sessio
         email = user.email
     )
     token = create_access_token(token_data)
-    return Token(token, 'bearer')
+    return Token(access_token=token, token_type='bearer').model_dump()

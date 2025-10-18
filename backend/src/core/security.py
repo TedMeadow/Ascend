@@ -11,6 +11,7 @@ from .jwt_schemas import TokenData
 from .config import settings
 from sqlmodel import select, or_, Session
 from .database import get_db
+from .utils import get_current_time
 # ...Здесь будет ваша логика для JWT и get_current_user...
 # ЗАГЛУШКА: пока создадим временную функцию
 from src.models.user import User
@@ -74,9 +75,9 @@ def create_access_token(data: TokenData, expires_delta: Optional[timedelta] = No
     to_encode = data.model_dump()
 
     if expires_delta:
-        expire = datetime.now(ZoneInfo(settings.TIMEZONE)) + expires_delta
+        expire = get_current_time() + expires_delta
     else:
-        expire = datetime.now(ZoneInfo(settings.TIMEZONE)) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = get_current_time() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({'exp': expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
