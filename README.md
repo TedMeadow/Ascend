@@ -46,7 +46,7 @@
 
 ## 🛠️ Технологический Стек
 
-*   **Backend (Этот репозиторий):**
+*   **Backend:**
     *   **Framework:** [**FastAPI**](https://fastapi.tiangolo.com/)
     *   **ORM и Валидация:** [**SQLModel**](https://sqlmodel.tiangolo.com/) (Pydantic + SQLAlchemy)
     *   **Миграции БД:** [**Alembic**](https://alembic.sqlalchemy.org/en/latest/)
