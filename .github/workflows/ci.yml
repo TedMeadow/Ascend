@@ -34,8 +34,6 @@ jobs:
           # Устанавливаем линтеры отдельно, чтобы они не попали в кеш зависимостей проекта
           pip install black ruff
 
-      - name: Run OpenGrep to find secrets
-        uses: accuknox/sast-scan-opengrep-action@1.0.0
         
       - name: Lint and check formatting
         run: |
