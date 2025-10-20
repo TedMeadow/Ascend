@@ -35,7 +35,7 @@ jobs:
           pip install black ruff
 
       - name: Run OpenGrep to find secrets
-        uses: authress/opengrep-action@v1
+        uses: accuknox/sast-scan-opengrep-action@1.0.0
         
       - name: Lint and check formatting
         run: |
