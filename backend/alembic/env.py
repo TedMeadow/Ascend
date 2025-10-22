@@ -8,7 +8,7 @@ from sqlmodel import SQLModel
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from src.models import ( # noqa: F401
+from src.models import (  # noqa: F401
     CalendarEvent,
     Idea,
     IdeaFolder,
