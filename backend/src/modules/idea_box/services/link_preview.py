@@ -32,7 +32,9 @@ def fetch_and_save_metadata(idea_id: UUID, url: str):
         try:
             # --- Шаг 1: Проверка кэша ---
             # Эффективность: если мы уже парсили этот URL, просто используем результат
-            cached_metadata = session.exec(select(LinkMetadata).where(LinkMetadata.url == url)).first()
+            cached_metadata = session.exec(
+                select(LinkMetadata).where(LinkMetadata.url == url)
+            ).first()
             if cached_metadata:
                 print(f"Found cached metadata for {url}")
                 metadata_to_link = cached_metadata
@@ -41,7 +43,9 @@ def fetch_and_save_metadata(idea_id: UUID, url: str):
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
                 }
-                with httpx.Client(headers=headers, follow_redirects=True, timeout=10.0) as client:
+                with httpx.Client(
+                    headers=headers, follow_redirects=True, timeout=10.0
+                ) as client:
                     response = client.get(url)
                     response.raise_for_status()  # Вызовет исключение для статусов 4xx/5xx
 
@@ -52,16 +56,15 @@ def fetch_and_save_metadata(idea_id: UUID, url: str):
                     tag = soup.find("meta", property=prop)
                     return tag["content"] if tag else None
 
-                title = _get_meta_property("og:title") or (soup.title.string if soup.title else None)
+                title = _get_meta_property("og:title") or (
+                    soup.title.string if soup.title else None
+                )
                 description = _get_meta_property("og:description")
                 image_url = _get_meta_property("og:image")
 
                 # --- Шаг 4: Сохранение новых метаданных ---
                 new_metadata = LinkMetadata(
-                    url=url,
-                    title=title,
-                    description=description,
-                    image_url=image_url
+                    url=url, title=title, description=description, image_url=image_url
                 )
                 session.add(new_metadata)
                 session.commit()
@@ -77,10 +80,14 @@ def fetch_and_save_metadata(idea_id: UUID, url: str):
                 session.commit()
                 print(f"Successfully linked metadata to Idea ID: {idea_id}")
             else:
-                print(f"Warning: Idea with ID {idea_id} not found after fetching metadata.")
+                print(
+                    f"Warning: Idea with ID {idea_id} not found after fetching metadata."
+                )
 
         except httpx.RequestError as e:
             print(f"HTTP Request Error for {url}: {e}")
         except Exception as e:
             # Общий обработчик, чтобы фоновая задача не "упала" молча
-            print(f"An unexpected error occurred while fetching metadata for {url}: {e}")
+            print(
+                f"An unexpected error occurred while fetching metadata for {url}: {e}"
+            )

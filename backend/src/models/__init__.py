@@ -1,20 +1,19 @@
-from .user import User, OAuthAccount
+from .calendar import CalendarEvent
+from .idea import Idea, IdeaFolder, IdeaTagLink, IdeaType, LinkMetadata, Tag
 from .oauth_config import OAuthProviderConfig
 from .task import Task
-from .calendar import CalendarEvent
-from .idea import Idea, IdeaFolder, IdeaTagLink, LinkMetadata, IdeaType, Tag
-
+from .user import OAuthAccount, User
 
 __all__ = [
-    'User',
-    'OAuthAccount',
-    'OAuthProviderConfig',
-    'Task',
-    'CalendarEvent',
-    'IdeaFolder',
-    'Idea',
-    'IdeaTagLink',
-    'LinkMetadata',
-    'IdeaType',
-    'Tag'
+    "User",
+    "OAuthAccount",
+    "OAuthProviderConfig",
+    "Task",
+    "CalendarEvent",
+    "IdeaFolder",
+    "Idea",
+    "IdeaTagLink",
+    "LinkMetadata",
+    "IdeaType",
+    "Tag",
 ]

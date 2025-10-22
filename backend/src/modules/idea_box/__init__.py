@@ -7,7 +7,6 @@ from .tags.router import tags_router
 idea_box_router = APIRouter(
     prefix="/idea-box",
     tags=["Idea Box"],
-    
 )
 
 # Подключаем к нему роутеры из под-модулей.

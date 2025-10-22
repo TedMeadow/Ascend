@@ -12,5 +12,5 @@ routers = [
     user_router,
     task_router,
     calendar_router,
-    idea_box_router
+    idea_box_router,
 ]
