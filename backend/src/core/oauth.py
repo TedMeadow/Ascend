@@ -11,9 +11,9 @@ def load_and_register_providers():
     """Загружает активные конфигурации OAuth из БД и регистрирует их в Authlib."""
     print("Loading and registering OAuth providers...")
     with Session(engine) as session:
-        statement = select(OAuthProviderConfig).where(
-            OAuthProviderConfig.is_active == True
-        )  # noqa: E712
+        statement = select(OAuthProviderConfig).where( # noqa: E712
+            OAuthProviderConfig.is_active == True # noqa: E712
+        )
         active_providers = session.exec(statement).all()
 
         for provider_config in active_providers:
