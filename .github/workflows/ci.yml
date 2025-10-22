@@ -41,14 +41,7 @@ jobs:
           black --check .
 
       - name: Run tests with Pytest
-        env:
-          DB_PATH: "sqlite:///./test_database.db"
-          DEBUG: "False"
-          ENCRYPTION_KEY: ${{ secrets.TEST_ENCRYPTION_KEY }}
-          SECRET_KEY: ${{ secrets.TEST_SECRET_KEY }}
-          JWT_ALGORITHM: "HS256"
-          ACCESS_TOKEN_EXPIRE_MINUTES: "30"
-          TIMEZONE: "UTC"
         run: |
+          echo "${{ secrets.ENV_TEST_CONTENT }} > .env.test"
           cd backend
           pytest
