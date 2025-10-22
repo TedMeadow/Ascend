@@ -43,5 +43,5 @@ jobs:
       - name: Run tests with Pytest
         run: |
           cd backend
-          echo "${{ secrets.ENV_TEST_CONTENT }} > .env.test"
+          echo "${{ secrets.ENV_TEST_CONTENT }}" > .env.test
           pytest
