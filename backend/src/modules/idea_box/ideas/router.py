@@ -2,7 +2,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
-from sqlmodel import Session, select, distinct
+from sqlmodel import Session, select
 from sqlalchemy import or_, desc
 
 from src.core.database import get_db

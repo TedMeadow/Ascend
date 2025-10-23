@@ -9,7 +9,7 @@ class TaskBase(BaseModel):
     title: str
     description: Optional[str] = None
     status: TaskStatus = TaskStatus.TODO
-    priority: TaskPriority = TaskPriority.MEDIUM # Добавляем в базовую схему
+    priority: TaskPriority = TaskPriority.MEDIUM  # Добавляем в базовую схему
     due_date: Optional[datetime] = None
 
 
@@ -21,7 +21,7 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[TaskStatus] = None
-    priority: TaskPriority = TaskPriority.MEDIUM # Добавляем в базовую схему
+    priority: TaskPriority = TaskPriority.MEDIUM  # Добавляем в базовую схему
     due_date: Optional[datetime] = None
 
 

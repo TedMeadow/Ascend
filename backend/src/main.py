@@ -29,9 +29,9 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Разрешаем запросы от нашего фронтенда
-    allow_credentials=True, # Разрешаем передачу cookie/авторизационных заголовков
-    allow_methods=["*"],    # Разрешаем все методы (GET, POST, PUT, DELETE и т.д.)
-    allow_headers=["*"],    # Разрешаем все заголовки
+    allow_credentials=True,  # Разрешаем передачу cookie/авторизационных заголовков
+    allow_methods=["*"],  # Разрешаем все методы (GET, POST, PUT, DELETE и т.д.)
+    allow_headers=["*"],  # Разрешаем все заголовки
 )
 
 

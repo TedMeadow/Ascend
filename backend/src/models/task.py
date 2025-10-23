@@ -16,6 +16,7 @@ class TaskStatus(str, Enum):
     IN_PROGRESS = "in_progress"
     DONE = "done"
 
+
 class TaskPriority(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
@@ -27,7 +28,9 @@ class Task(SQLModel, table=True):
     title: str = Field(index=True)
     description: Optional[str] = None
     status: TaskStatus = Field(default=TaskStatus.TODO)
-    priority: TaskPriority = Field(default=TaskPriority.MEDIUM) # По умолчанию - средний
+    priority: TaskPriority = Field(
+        default=TaskPriority.MEDIUM
+    )  # По умолчанию - средний
     due_date: Optional[datetime] = None
 
     owner_id: UUID = Field(foreign_key="user.id")
