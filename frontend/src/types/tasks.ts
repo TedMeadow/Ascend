@@ -26,21 +26,44 @@ export interface Task {
 }
 
 /**
+ * Приоритеты задачи.
+ */
+export enum TaskPriority {
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+}
+
+/**
+ * Базовая модель задачи.
+ */
+export interface Task {
+  id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority; // Добавляем поле
+  due_date: string | null;
+}
+
+/**
  * Данные для создания новой задачи.
  */
 export interface TaskCreate {
   title: string;
   description?: string | null;
   status?: TaskStatus;
+  priority?: TaskPriority; // Добавляем поле
   due_date?: string | null;
 }
 
 /**
- * Данные для обновления существующей задачи. Все поля опциональны.
+ * Данные для обновления существующей задачи.
  */
 export interface TaskUpdate {
   title?: string;
-  description?: string;
+  description?: string | null; // <-- ИЗМЕНЕНИЕ: Добавляем | null
   status?: TaskStatus;
-  due_date?: string | null;
+  priority?: TaskPriority;
+  due_date?: string | null; // <-- ИЗМЕНЕНИЕ: Добавляем | null
 }

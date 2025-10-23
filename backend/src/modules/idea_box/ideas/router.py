@@ -2,7 +2,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
-from sqlmodel import Session, select
+from sqlmodel import Session, select, distinct
 from sqlalchemy import or_, desc
 
 from src.core.database import get_db
@@ -73,6 +73,8 @@ def get_ideas(
     if tags:
         # Фильтр идей, которые содержат ЛЮБОЙ из перечисленных тегов
         statement = statement.join(Idea.tags).where(Tag.name.in_(tags))
+        # ✅ ИСПРАВЛЕНИЕ: Применяем .distinct() после JOIN
+        statement = statement.distinct()
 
     if q:
         # Поиск без учета регистра по названию и содержанию
