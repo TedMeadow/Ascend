@@ -24,10 +24,6 @@ def session_fixture():
         yield session
     SQLModel.metadata.drop_all(engine)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> aab01a4 (Initial commit)
 # Эта фикстура создает экземпляр TestClient для отправки запросов к приложению.
 @pytest.fixture(name="client")
 def client_fixture(session: Session):
@@ -38,18 +34,9 @@ def client_fixture(session: Session):
 
     # "Горячая" замена зависимости get_db на нашу тестовую функцию
     app.dependency_overrides[get_db] = get_session_override
-<<<<<<< HEAD
 
     client = TestClient(app)
     yield client
 
     # Очищаем замену после теста
     app.dependency_overrides.clear()
-=======
-    
-    client = TestClient(app)
-    yield client
-    
-    # Очищаем замену после теста
-    app.dependency_overrides.clear()
->>>>>>> aab01a4 (Initial commit)
