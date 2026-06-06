@@ -1,10 +1,12 @@
 from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID, uuid4
 
+from sqlalchemy import JSON, Column
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .calendar import CalendarEvent
+    from .finance import Budget, Transaction
     from .idea import Idea, IdeaFolder, Tag
     from .task import Task
 
@@ -16,6 +18,7 @@ class User(SQLModel, table=True):
     is_active: bool = True
     email: str = Field(unique=True, index=True)
     is_superuser: bool = Field(default=False)
+    dashboard_layout: Optional[list] = Field(default=None, sa_column=Column(JSON))
 
     oauth_accounts: List["OAuthAccount"] = Relationship(back_populates="user")
     tasks: List["Task"] = Relationship(back_populates="owner")
@@ -23,10 +26,12 @@ class User(SQLModel, table=True):
     idea_folders: List["IdeaFolder"] = Relationship(back_populates="owner")
     ideas: List["Idea"] = Relationship(back_populates="owner")
     tags: List["Tag"] = Relationship(back_populates="owner")
+    transactions: List["Transaction"] = Relationship(back_populates="owner")
+    budgets: List["Budget"] = Relationship(back_populates="owner")
 
 
 class OAuthAccount(SQLModel, table=True):
-    id: Optional[UUID] = Field(primary_key=True, default=None)
+    id: Optional[UUID] = Field(primary_key=True, default_factory=uuid4)
     provider: str
     account_id: str
     user_id: UUID = Field(foreign_key="user.id")

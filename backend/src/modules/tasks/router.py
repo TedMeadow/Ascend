@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from uuid import UUID
-from sqlmodel import Session
+from sqlmodel import Session, select
 from src.core.database import get_db
 from src.core.security import get_current_user
 from src.models.user import User
@@ -13,12 +13,11 @@ task_router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @task_router.post("/", response_model=TaskPublic, status_code=status.HTTP_201_CREATED)
-async def create_task(
+def create_task(
     task_data: TaskCreate | None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    print("im in tasks")
     if not task_data:
         raise HTTPException(400, "There is no task info")
     task = Task.model_validate(task_data, update={"owner_id": current_user.id})
@@ -29,14 +28,14 @@ async def create_task(
 
 
 @task_router.get("/", response_model=List[TaskPublic])
-async def get_tasks(
+def get_tasks(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
-    return current_user.tasks
+    return db.exec(select(Task).where(Task.owner_id == current_user.id)).all()
 
 
-@task_router.get("/{task_id}")
-async def get_task(
+@task_router.get("/{task_id}", response_model=TaskPublic)
+def get_task(
     task_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -50,7 +49,7 @@ async def get_task(
 
 
 @task_router.put("/{task_id}", response_model=TaskPublic)
-async def update_task(
+def update_task(
     task_id: UUID,
     task_in: TaskUpdate,
     current_user: User = Depends(get_current_user),
@@ -63,7 +62,7 @@ async def update_task(
         )
     task_data = task_in.model_dump(exclude_unset=True)
     for key, value in task_data.items():
-        if value:
+        if value is not None:
             setattr(task, key, value)
     db.add(task)
     db.commit()
@@ -72,7 +71,7 @@ async def update_task(
 
 
 @task_router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(
+def delete_task(
     task_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),

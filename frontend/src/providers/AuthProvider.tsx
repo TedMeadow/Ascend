@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api } from '@/lib/api';
-import { UserPublic } from '@/types'; // <-- Чистый импорт!
+import { setAccessToken } from '@/lib/api/_base';
+import { UserPublic } from '@/types';
 
 interface AuthContextType {
   user: UserPublic | null;
@@ -18,34 +19,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkUserStatus = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        try {
-          const userData = await api.auth.getMe();
-          setUser(userData);
-        } catch (error) {
-          console.error("Failed to authenticate with token", error);
-          // Если токен невалидный, чистим его
-          localStorage.removeItem('accessToken');
-        }
+    // Attempt to restore session using the httpOnly refresh cookie
+    const restoreSession = async () => {
+      try {
+        const tokenData = await api.auth.refresh();
+        setAccessToken(tokenData.access_token);
+        const userData = await api.auth.getMe();
+        setUser(userData);
+      } catch {
+        setAccessToken(null);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
-    checkUserStatus();
+
+    restoreSession();
+
+    // Listen for forced logouts triggered by failed token refresh in _base.ts
+    const handleForcedLogout = () => performLogout();
+    window.addEventListener('auth:logout', handleForcedLogout);
+    return () => window.removeEventListener('auth:logout', handleForcedLogout);
   }, []);
 
   const login = async (token: string) => {
-    localStorage.setItem('accessToken', token);
+    setAccessToken(token);
     const userData = await api.auth.getMe();
     setUser(userData);
   };
 
-  const logout = () => {
-    localStorage.removeItem('accessToken');
+  const performLogout = () => {
+    setAccessToken(null);
     setUser(null);
-    // Можно добавить редирект на страницу логина
     window.location.href = '/login';
+  };
+
+  const logout = async () => {
+    try {
+      await api.auth.logout();
+    } catch {
+      // Proceed even if server call fails
+    }
+    performLogout();
   };
 
   return (

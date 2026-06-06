@@ -88,9 +88,9 @@ def update_event(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
         )
-    event_data = event_in.model_dump()
+    event_data = event_in.model_dump(exclude_unset=True)
     for key, value in event_data.items():
-        if value:
+        if value is not None:
             setattr(event, key, value)
     db.add(event)
     db.commit()

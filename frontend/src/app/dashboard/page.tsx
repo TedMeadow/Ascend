@@ -1,27 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Layout } from "react-grid-layout";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
+import { api } from "@/lib/api";
+import { useDebounce } from "@/hooks/useDebounce";
 import { DashboardGrid } from "./components/DashboardGrid";
 import { ManageWidgetsDialog } from "./components/ManageWidgetsDialog";
 
-// В будущем это будет загружаться из настроек пользователя
-const initialLayout: Layout[] = [
+const DEFAULT_LAYOUT: Layout[] = [
   { i: "clock", x: 0, y: 0, w: 4, h: 2, minW: 3, minH: 2 },
   { i: "tasks-summary", x: 4, y: 0, w: 4, h: 2, minW: 3, minH: 2 },
 ];
 
 export default function DashboardPage() {
-  const [layout, setLayout] = useState<Layout[]>(initialLayout);
+  const { user } = useAuth();
+  const [layout, setLayout] = useState<Layout[]>(DEFAULT_LAYOUT);
   const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  // В будущем эта функция будет сохранять изменения на бэкенде
-  const handleLayoutChange = (newLayout: Layout[]) => {
+  useEffect(() => {
+    if (user && !initialized) {
+      if (user.dashboard_layout && user.dashboard_layout.length > 0) {
+        setLayout(user.dashboard_layout);
+      }
+      setInitialized(true);
+    }
+  }, [user, initialized]);
+
+  const debouncedLayout = useDebounce(layout, 800);
+
+  useEffect(() => {
+    if (!initialized) return;
+    api.auth.saveDashboardLayout(debouncedLayout).catch(() => {});
+  }, [debouncedLayout, initialized]);
+
+  const handleLayoutChange = useCallback((newLayout: Layout[]) => {
     setLayout(newLayout);
-    // console.log("Layout changed:", newLayout);
-  };
+  }, []);
 
   return (
     <div className="container mx-auto">
@@ -37,7 +55,7 @@ export default function DashboardPage() {
       </div>
 
       <DashboardGrid layout={layout} onLayoutChange={handleLayoutChange} />
-      
+
       <ManageWidgetsDialog
         isOpen={isManageDialogOpen}
         onOpenChange={setIsManageDialogOpen}

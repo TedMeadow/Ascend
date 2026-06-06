@@ -14,14 +14,12 @@ folders_router = APIRouter(
 
 
 @folders_router.post("/", response_model=FolderPublic, status_code=201)
-async def create_folder(
+def create_folder(
     folder_data: FolderCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    folder = IdeaFolder.model_validate(
-        folder_data, update={"owner_id": current_user.id}
-    )
+    folder = IdeaFolder.model_validate(folder_data, update={"owner_id": current_user.id})
     db.add(folder)
     db.commit()
     db.refresh(folder)
@@ -29,15 +27,14 @@ async def create_folder(
 
 
 @folders_router.get("/", response_model=List[FolderPublic])
-async def get_user_folders(
+def get_user_folders(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
-    folders = current_user.idea_folders
-    return folders
+    return db.exec(select(IdeaFolder).where(IdeaFolder.owner_id == current_user.id)).all()
 
 
 @folders_router.put("/{folder_id}", response_model=FolderPublic)
-async def update_folder(
+def update_folder(
     folder_id: UUID,
     folder_in: FolderUpdate,
     current_user: User = Depends(get_current_user),
@@ -45,12 +42,10 @@ async def update_folder(
 ):
     folder = db.get(IdeaFolder, folder_id)
     if not folder or folder.owner_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="IdeaFolder not found"
-        )
-    folder_data = folder_in.model_dump()
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IdeaFolder not found")
+    folder_data = folder_in.model_dump(exclude_unset=True)
     for key, value in folder_data.items():
-        if value:
+        if value is not None:
             setattr(folder, key, value)
     db.add(folder)
     db.commit()
@@ -59,16 +54,14 @@ async def update_folder(
 
 
 @folders_router.delete("/{folder_id}", status_code=204)
-def delete_event(
+def delete_folder(
     folder_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     folder = db.get(IdeaFolder, folder_id)
     if not folder or folder.owner_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="IdeaFolder not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IdeaFolder not found")
     db.delete(folder)
     db.commit()
 
@@ -79,12 +72,9 @@ def get_tags_in_folder(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-
     folder = db.get(IdeaFolder, folder_id)
     if not folder or folder.owner_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Folder not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Folder not found")
 
     statement = (
         select(Tag, func.count(Idea.id).label("idea_count"))
@@ -102,7 +92,6 @@ def get_tags_in_folder(
     for tag, count in results:
         update_data = tag.model_dump()
         update_data["idea_count"] = count
-        tag_data = TagWithCount.model_validate(update_data)
-        tags_with_counts.append(tag_data)
+        tags_with_counts.append(TagWithCount.model_validate(update_data))
 
     return tags_with_counts

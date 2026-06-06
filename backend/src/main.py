@@ -1,37 +1,40 @@
-from fastapi import FastAPI
+import logging
 from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from .modules.routers import routers
 from .core.oauth import load_and_register_providers
+from .core.config import settings
+from .core.limiter import limiter
 
-# 1. Импортируем middleware
-from fastapi.middleware.cors import CORSMiddleware
+logging.basicConfig(
+    level=logging.DEBUG if settings.DEBUG else logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Your startup logic here
     load_and_register_providers()
-    print("Application startup")
+    logger.info("Application startup")
     yield
-    # Your shutdown logic here
-    print("Application shutdown")
+    logger.info("Application shutdown")
 
 
 app = FastAPI(lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# 2. Определяем, каким фронтенд-адресам мы доверяем
-#    Порт 3000 - это стандартный порт для Next.js в режиме разработки
-origins = [
-    "http://localhost:3000",
-]
-
-# 3. Добавляем middleware для обработки CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Разрешаем запросы от нашего фронтенда
-    allow_credentials=True,  # Разрешаем передачу cookie/авторизационных заголовков
-    allow_methods=["*"],  # Разрешаем все методы (GET, POST, PUT, DELETE и т.д.)
-    allow_headers=["*"],  # Разрешаем все заголовки
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

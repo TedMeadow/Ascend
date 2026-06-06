@@ -1,4 +1,5 @@
 from .calendar import CalendarEvent
+from .finance import Budget, Transaction, TransactionType
 from .idea import Idea, IdeaFolder, IdeaTagLink, IdeaType, LinkMetadata, Tag
 from .oauth_config import OAuthProviderConfig
 from .task import Task
@@ -16,4 +17,7 @@ __all__ = [
     "LinkMetadata",
     "IdeaType",
     "Tag",
+    "Transaction",
+    "TransactionType",
+    "Budget",
 ]

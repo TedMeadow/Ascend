@@ -21,7 +21,7 @@ class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     status: Optional[TaskStatus] = None
-    priority: TaskPriority = TaskPriority.MEDIUM  # Добавляем в базовую схему
+    priority: Optional[TaskPriority] = None
     due_date: Optional[datetime] = None
 
 

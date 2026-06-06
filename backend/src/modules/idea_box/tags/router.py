@@ -13,7 +13,7 @@ tags_router = APIRouter(
 
 
 @tags_router.get("/", response_model=List[TagWithCount])
-async def get_tags(
+def get_tags(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
     statement = (
@@ -29,41 +29,35 @@ async def get_tags(
     for tag, count in results:
         update_data = tag.model_dump()
         update_data["idea_count"] = count
-        tag_data = TagWithCount.model_validate(update_data)
-        tags_with_counts.append(tag_data)
-
+        tags_with_counts.append(TagWithCount.model_validate(update_data))
     return tags_with_counts
 
 
 @tags_router.put("/{tag_id}", response_model=TagPublic)
-async def rename_tag(
+def rename_tag(
     tag_id: UUID,
     tag_in: TagUpdate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     tag = db.get(Tag, tag_id)
-    if not tag or tag.owner_id != current_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-        )
+    if not tag or tag.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
     tag.name = tag_in.name
     db.add(tag)
     db.commit()
-    db.refresh()
+    db.refresh(tag)
     return tag
 
 
 @tags_router.delete("/{tag_id}", status_code=204)
-async def delete_tag(
+def delete_tag(
     tag_id: UUID,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     tag = db.get(Tag, tag_id)
-    if not tag or tag.owner_id != current_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-        )
+    if not tag or tag.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
     db.delete(tag)
     db.commit()

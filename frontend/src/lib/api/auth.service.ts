@@ -1,3 +1,4 @@
+import { Layout } from 'react-grid-layout';
 import { http } from './_base';
 import { Token, UserCreate, UserPublic } from '@/types';
 
@@ -15,8 +16,23 @@ export const authService = {
       body: JSON.stringify(data),
     });
   },
-  
+
   getMe: (): Promise<UserPublic> => {
     return http.request<UserPublic>('/user/me');
+  },
+
+  refresh: (): Promise<Token> => {
+    return http.request<Token>('/auth/refresh', { method: 'POST' });
+  },
+
+  logout: (): Promise<void> => {
+    return http.request<void>('/auth/logout', { method: 'POST' });
+  },
+
+  saveDashboardLayout: (layout: Layout[]): Promise<UserPublic> => {
+    return http.request<UserPublic>('/user/me/dashboard-layout', {
+      method: 'PATCH',
+      body: JSON.stringify({ layout }),
+    });
   },
 };

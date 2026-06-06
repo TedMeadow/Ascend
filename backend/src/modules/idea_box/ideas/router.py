@@ -20,7 +20,7 @@ ideas_router = APIRouter(
 
 
 @ideas_router.post("/", response_model=IdeaPublic, status_code=201)
-async def create_idea(
+def create_idea(
     idea_in: IdeaCreate,
     background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
